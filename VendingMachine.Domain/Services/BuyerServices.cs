@@ -49,9 +49,10 @@ public class BuyerServices
         if (!await _buyerRepository.IsNameUniqueAsync(id, name, cancellationToken))
             throw new DuplicateNameException(name);
 
+        var result = await _unitOfWork.SaveChangesAsync();
+        if (result == 0)
+            throw new SaveFaildExeption("Something went wrong , buyer data was not saved");
 
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
 

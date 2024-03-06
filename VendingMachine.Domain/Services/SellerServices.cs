@@ -12,31 +12,31 @@ namespace VendingMachine.Domain.Services;
 
 public class SellerServices
 {
-    private readonly ISellerRepository _buyerRepository;
+    private readonly ISellerRepository _sellerRepository;
 
     private readonly IUnitOfWork _unitOfWork;
-    public SellerServices(ISellerRepository buyerRepository, IUnitOfWork unitOfWork)
+    public SellerServices(ISellerRepository sellerRepository, IUnitOfWork unitOfWork)
     {
-        _buyerRepository = buyerRepository;
+        _sellerRepository = sellerRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Guid> CreateSellerAsync(Seller buyer, CancellationToken ct)
+    public async Task<Guid> CreateSellerAsync(Seller seller, CancellationToken ct)
     {
-        if (buyer == null)
+        if (seller == null)
             throw new NullReferenceException("Seller Cannot be null ");
-        if (!await _buyerRepository.IsNameUniqueAsync(buyer.Id, buyer.Name, ct))
-            throw new DuplicateNameException(buyer.Name);
-        _buyerRepository.Insert(buyer);
+        if (!await _sellerRepository.IsNameUniqueAsync(seller.Id, seller.Name, ct))
+            throw new DuplicateNameException(seller.Name);
+        _sellerRepository.Insert(seller);
         var result = await _unitOfWork.SaveChangesAsync();
         if (result == 0)
-            throw new SaveFaildExeption("Something went wrong , buyer data was not saved");
+            throw new SaveFaildExeption("Something went wrong , seller data was not saved");
 
-        return buyer.Id;
+        return seller.Id;
     }
     public async Task<Result> UpdateSellerAsync(Guid id, string name, CancellationToken cancellationToken = default)
     {
-        var existingSeller = await _buyerRepository.GetByIdAsync(id);
+        var existingSeller = await _sellerRepository.GetByIdAsync(id);
 
         if (existingSeller == null)
             return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Seller), id)));
@@ -46,7 +46,7 @@ public class SellerServices
             return Result.Failure(updateResult.Errors);
 
 
-        if (!await _buyerRepository.IsNameUniqueAsync(id, name, cancellationToken))
+        if (!await _sellerRepository.IsNameUniqueAsync(id, name, cancellationToken))
             throw new DuplicateNameException(name);
 
 
@@ -54,4 +54,7 @@ public class SellerServices
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result.Success();
     }
+
+
+
 }

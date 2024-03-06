@@ -7,9 +7,9 @@ using VendingMachine.Domain.Models;
 
 namespace VendingMachine.Domain.Interfaces;
 
-public interface ISellerRepository:IGenericRepository<Seller>
+public interface IProductRepository:IGenericRepository<Product>
 {
-    Task<Seller?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+    Task<Product?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
     Task<bool> IsNameUniqueAsync(Guid execludedId, string name, CancellationToken cancellationToken = default);
 
 }

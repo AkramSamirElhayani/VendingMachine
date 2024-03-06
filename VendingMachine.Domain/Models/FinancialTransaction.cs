@@ -26,7 +26,7 @@ public class FinancialTransaction : Entity
     /// <returns></returns>
     /// <exception cref="InvalidCoinCountException"></exception>
     /// <exception cref="InvalidCoinException"></exception>
-    public FinancialTransaction Create(Guid buyerId, FinancialTransactionType transactionType, int coin, int coinCount)
+    public static FinancialTransaction Create(Guid buyerId, FinancialTransactionType transactionType, int coin, int coinCount)
     {
         if (coinCount <= 0)
             throw new InvalidCoinCountException(coin);

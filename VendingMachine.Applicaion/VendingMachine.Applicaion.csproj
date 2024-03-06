@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Buyer\Command\Deposit\" />
+    <Folder Include="Buyer\Command\Buy\" />
+    <Folder Include="Buyer\Command\Withdraw\" />
+    <Folder Include="Sellers\Command\CreateProduct\" />
+    <Folder Include="Sellers\Command\AddProductAmount\" />
+    <Folder Include="Buyer\Command\UpdateBuyer\" />
+    <Folder Include="Buyer\Queries\GetBuyerInfo\" />
+    <Folder Include="Sellers\Command\UpdateSeller\" />
+    <Folder Include="Sellers\Queries\GetProductInfo\" />
+    <Folder Include="Sellers\Command\CreateSeller\" />
+    <Folder Include="Sellers\Queries\GetSellerInfo\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VendingMachine.Domain\VendingMachine.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

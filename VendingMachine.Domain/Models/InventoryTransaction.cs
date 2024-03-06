@@ -11,21 +11,28 @@ public class InventoryTransaction:Entity
 {
 
 
-    private InventoryTransaction(Guid id , Guid porductId, int count, DateTime date):base(id)
+    private InventoryTransaction(Guid id, Guid porductId, int count, DateTime date, InventoryTransactionType transactionType) : base(id)
     {
         PorductId = porductId;
         Count = count;
         Date = date;
+        TransactionType = transactionType;
     }
-    public static InventoryTransaction Create(Guid productId ,int count)
+    public static InventoryTransaction Create(Guid productId , InventoryTransactionType transactionType, int count)
     {
         if (count >= 0)
             throw new ArgumentException("Count Must be more than zero", nameof(count));
 
-        return new InventoryTransaction(Guid.NewGuid(), productId, count, DateTime.Now);
+        return new InventoryTransaction(Guid.NewGuid(), productId, count, DateTime.Now,transactionType);
     }
 
     public Guid PorductId { get; set; }
     public int Count { get; set; }
     public DateTime Date { get; set; }
+    public InventoryTransactionType TransactionType { get; set; }
+}
+public enum InventoryTransactionType
+{
+    Add,
+    Remove
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VendingMachine.Domain.Core;
+using VendingMachine.Domain.Exeptions;
 
 namespace VendingMachine.Domain.Models;
 
@@ -18,13 +19,36 @@ public class Product:Entity
         SellerId = sellerId;
     }
 
-    public static Product Create(string name , Guid sellerId , string? description)
+    public static Product Create(string name ,int price , Guid sellerId , string? description)
     {
         if (string.IsNullOrEmpty(name))
             throw new InvalidNameExeption();
+        if(!(price%FinancialTransaction.AllowedCoins.Min() == 0))
+            throw new InvalidPriceExeption(FinancialTransaction.AllowedCoins.Min());
         return new Product(Guid.NewGuid(), name, sellerId, description);
     }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-    public Guid SellerId { get; set; }
+
+    public Result Update(string name, string? description)
+    {
+        if (string.IsNullOrEmpty(name))
+            throw new InvalidNameExeption();
+
+        Name = name;
+        Description = description;
+        return Result.Success();
+    }
+    public Result UpdatePrice(int price)
+    {
+        if (!(price % FinancialTransaction.AllowedCoins.Min() == 0))
+            throw new InvalidPriceExeption(FinancialTransaction.AllowedCoins.Min());
+
+        Price = price;
+        return Result.Success();
+    }
+
+
+    public string Name { get;private set; }
+    public int Price { get;private set; }
+    public string? Description { get;private set; }
+    public Guid SellerId { get; }
 }
