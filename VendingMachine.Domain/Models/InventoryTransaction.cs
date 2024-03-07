@@ -20,7 +20,7 @@ public class InventoryTransaction:Entity
     }
     public static InventoryTransaction Create(Guid productId , InventoryTransactionType transactionType, int count)
     {
-        if (count >= 0)
+        if (count <= 0)
             throw new ArgumentException("Count Must be more than zero", nameof(count));
 
         return new InventoryTransaction(Guid.NewGuid(), productId, count, DateTime.Now,transactionType);

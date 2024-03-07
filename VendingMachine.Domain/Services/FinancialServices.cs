@@ -42,22 +42,6 @@ public class FinancialServices
     }
     
 
-    //public static Dictionary<int, int> GetCurrencyBills(int[] curvals, int amount)
-    //{
-    //    Dictionary<int, int> map = new Dictionary<int, int>();
-
-    //    curvals
-    //    .OrderByDescending(c => c)
-    //    .ToList()
-    //    .ForEach(c =>
-    //    {
-    //        map.Add(c, amount / c);
-    //        amount = amount % c;
-    //    });
-
-    //    return map.Where(m => m.Value != 0).ToDictionary(c => c.Key, c => c.Value);
-    //}
-
     /// <summary>
     /// withdraw all avalabile balance for a buyer
     /// return a dictionary that represent the number of coins 
@@ -93,6 +77,8 @@ public class FinancialServices
                 balance = balance -( coin.Key*coin.Value);
             }
         }
+        if (balance > 0)
+            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new InsufficantBalanceException()));
 
         foreach (var item in coinsToWithdraw)
         {

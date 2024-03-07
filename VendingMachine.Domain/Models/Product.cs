@@ -12,11 +12,12 @@ public class Product:Entity
 {
 
 
-    private Product(Guid id,string name,  Guid sellerId, string? description) : base(id)
+    private Product(Guid id, string name, Guid sellerId, string? description, int price) : base(id)
     {
         Name = name;
         Description = description;
         SellerId = sellerId;
+        Price = price;
     }
 
     public static Product Create(string name ,int price , Guid sellerId , string? description)
@@ -25,7 +26,8 @@ public class Product:Entity
             throw new InvalidNameExeption();
         if(!(price%FinancialTransaction.AllowedCoins.Min() == 0))
             throw new InvalidPriceExeption(FinancialTransaction.AllowedCoins.Min());
-        return new Product(Guid.NewGuid(), name, sellerId, description);
+
+        return new Product(Guid.NewGuid(), name, sellerId, description,price);
     }
 
     public Result Update(string name, string? description)

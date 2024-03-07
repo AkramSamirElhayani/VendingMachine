@@ -35,7 +35,7 @@ public class FinancialTransaction : Entity
         return new FinancialTransaction(Guid.NewGuid(), buyerId, transactionType, coin, coinCount,DateTime.Now);
     }
     public Guid BuyerId { get; set; }
-    FinancialTransactionType TransactionType { get; set; }
+    public FinancialTransactionType TransactionType { get; set; }
     //This Should Be of type a decimal or a double in most cases ,
     //but since the Vending Machine will be accepting only 5,10,20,50 and 100 coins ,
     //we will keep it int 
