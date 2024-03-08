@@ -10,7 +10,7 @@ using VendingMachine.Domain.Models;
 
 namespace VendingMachine.Domain.Services;
 
-public class BuyerServices
+public class BuyerServices : IBuyerServices
 {
     private readonly IBuyerRepository _buyerRepository;
 
@@ -39,7 +39,7 @@ public class BuyerServices
         var existingBuyer = await _buyerRepository.GetByIdAsync(id);
 
         if (existingBuyer == null)
-            return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Buyer),id)));
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer),id)));
 
         var updateResult = existingBuyer.Update(name);
         if (updateResult.IsFailure)
@@ -55,6 +55,9 @@ public class BuyerServices
 
         return Result.Success();
     }
+
+
+
 
 
 }

@@ -15,5 +15,12 @@ public interface IInventoryTransactionRepository
     void Insert(InventoryTransaction entity);
     //void Remove(InventoryTransaction entity);
     Task<int> GetProductBalanceAsync(Guid productId ,CancellationToken ct);
+    /// <summary>
+    /// Returns the sum of the total sold item price for a spcific buyer
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<int> GetTotalSoldProductsSumPriceAsync(Guid id, CancellationToken cancellationToken);
 
 }

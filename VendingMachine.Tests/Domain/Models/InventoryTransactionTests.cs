@@ -16,32 +16,50 @@ namespace VendingMachine.Tests.Domain.Models;
 public class InventoryTransactionTests
 {
     [Test]
-    public void Create_WithPositiveCount_ShouldThrowArgumentException()
+    public void Create_WithNonPositiveCount_ShouldThrowArgumentException()
     {
         // Arrange
         var productId = Guid.NewGuid();
         var transactionType = InventoryTransactionType.Add;
-        int count = 0; 
+        int count = 0;
+        int price = 10;
 
         // Act
-        Action act = () => InventoryTransaction.Create(productId, transactionType, count);
+        Action act = () => InventoryTransaction.Create(productId, transactionType, count,price);
 
         // Assert
         act.Should().Throw<ArgumentException>()
             .WithMessage("Count Must be more than zero (Parameter 'count')");
     
     }
+    [Test]
+    public void Create_WithNonPositivePrice_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var productId = Guid.NewGuid();
+        var transactionType = InventoryTransactionType.Add;
+        int count = 5;
+        int price = 0;
 
+        // Act
+        Action act = () => InventoryTransaction.Create(productId, transactionType, count, price);
+
+        // Assert
+        act.Should().Throw<ArgumentException>(); 
+
+    }
     [Test]
     public void Create_WithValidCount_ShouldCreateInventoryTransactionSuccessfully()
     {
         // Arrange
         var productId = Guid.NewGuid();
         var transactionType = InventoryTransactionType.Add;
-        int count = 5; 
+        int count = 5;
+        int price = 10;
+
 
         // Act
-        var transaction = InventoryTransaction.Create(productId, transactionType, count);
+        var transaction = InventoryTransaction.Create(productId, transactionType, count, price);
 
         // Assert
         transaction.Should().NotBeNull();
@@ -50,5 +68,7 @@ public class InventoryTransactionTests
         transaction.TransactionType.Should().Be(transactionType);
         transaction.Date.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1)); // Allows a small leeway in timing
     }
+
+
 }
 

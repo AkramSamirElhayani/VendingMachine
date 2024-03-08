@@ -39,7 +39,7 @@ public class SellerServices
         var existingSeller = await _sellerRepository.GetByIdAsync(id);
 
         if (existingSeller == null)
-            return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Seller), id)));
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Seller), id)));
 
         var updateResult = existingSeller.Update(name);
         if (updateResult.IsFailure)

@@ -5,22 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VendingMachine.Domain.Core;
+using VendingMachine.Domain.Exeptions;
 using VendingMachine.Domain.Interfaces;
 using VendingMachine.Domain.Models;
 
 namespace VendingMachine.Domain.Services;
 
-public class ProductServices
+public class ProductServices: IProductServices
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IProductRepository _productRepository; 
     private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ISellerRepository _sellerRepository;
 
-    public ProductServices(IProductRepository productRepository, IUnitOfWork unitOfWork, IInventoryTransactionRepository inventoryTransactionRepository)
+    public ProductServices(IProductRepository productRepository, IUnitOfWork unitOfWork, IInventoryTransactionRepository inventoryTransactionRepository, ISellerRepository sellerRepository)
     {
         _productRepository = productRepository;
         _unitOfWork = unitOfWork;
         _inventoryTransactionRepository = inventoryTransactionRepository;
+        _sellerRepository = sellerRepository;
     }
     public async Task<Guid> CreateProductAsync(Product product, CancellationToken ct)
     {
@@ -28,6 +31,9 @@ public class ProductServices
             throw new NullReferenceException("Product Cannot be null ");
         if (!await _productRepository.IsNameUniqueAsync(product.Id, product.Name, ct))
             throw new DuplicateNameException(product.Name);
+        if (!await _sellerRepository.AnyAsync(s => s.Id == product.SellerId))
+            throw new EntityNotFoundException(typeof(Seller), product.Id);
+
         _productRepository.Insert(product);
         var result = await _unitOfWork.SaveChangesAsync();
         if (result == 0)
@@ -40,7 +46,7 @@ public class ProductServices
         var existingProduct = await _productRepository.GetByIdAsync(id);
 
         if (existingProduct == null)
-            return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Product), id)));
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), id)));
 
         var updateResult = existingProduct.Update(name, description);
         if (updateResult.IsFailure)
@@ -61,7 +67,7 @@ public class ProductServices
         var existingProduct = await _productRepository.GetByIdAsync(id);
 
         if (existingProduct == null)
-            return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Product), id)));
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), id)));
 
         var updateResult = existingProduct.UpdatePrice(price);
         if (updateResult.IsFailure)
@@ -87,9 +93,9 @@ public class ProductServices
         var existingProduct = await _productRepository.GetByIdAsync(productId);
 
         if (existingProduct == null)
-            return Result.Failure<int>(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Product), productId)));
+            return Result.Failure<int>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), productId)));
 
-        _inventoryTransactionRepository.Insert(InventoryTransaction.Create(productId,InventoryTransactionType.Add, count));
+        _inventoryTransactionRepository.Insert(InventoryTransaction.Create(productId,InventoryTransactionType.Add, count, existingProduct.Price));
         var result = await _unitOfWork.SaveChangesAsync();
         if (result == 0)
             throw new SaveFaildExeption("Something went wrong , Inventory Transaction was not created");
@@ -103,15 +109,19 @@ public class ProductServices
         var existingProduct = await _productRepository.GetByIdAsync(productId);
 
         if (existingProduct == null)
-            return Result.Failure<int>(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Product), productId)));
+            return Result.Failure<int>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), productId)));
 
-        _inventoryTransactionRepository.Insert(InventoryTransaction.Create(productId, InventoryTransactionType.Remove, count));
+        if (await _inventoryTransactionRepository.GetProductBalanceAsync(productId, ct) < count)
+            return Result.Failure<int>(Error.CreateFormExeption(new InsufficantProductBalanceException()));
+
+        _inventoryTransactionRepository.Insert(InventoryTransaction.Create(productId, InventoryTransactionType.Remove, count, existingProduct.Price));
 
         var result = await _unitOfWork.SaveChangesAsync();
         if (result == 0)
             throw new SaveFaildExeption("Something went wrong , Inventory Transaction was not created");
 
-        return Result.Success(result);
+        return Result.Success();
 
     }
+
 }

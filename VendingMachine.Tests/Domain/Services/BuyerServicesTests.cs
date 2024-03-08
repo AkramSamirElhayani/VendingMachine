@@ -96,7 +96,7 @@ public class BuyerServicesTests
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Errors.Should().Contain(e => e.Code == "EntitiyNotFoundException");
+        result.Errors.Should().Contain(e => e.Code == nameof(EntityNotFoundException));
     }
     [Test]
     public async Task UpdateBuyerAsync_WhenSaveFails_ShouldThrowSaveFailedException()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,23 +11,25 @@ using VendingMachine.Domain.Models;
 
 namespace VendingMachine.Domain.Services;
 
-public class FinancialServices
+public class FinancialServices: IFinancialServices
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFinancialTransactionRepository _financialTransactionRepository;
+    private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
     private readonly IBuyerRepository _buyerRepository;
 
-    public FinancialServices(IFinancialTransactionRepository financialTransactionRepository, IUnitOfWork unitOfWork, IBuyerRepository buyerRepository)
+    public FinancialServices(IFinancialTransactionRepository financialTransactionRepository, IUnitOfWork unitOfWork, IBuyerRepository buyerRepository, IInventoryTransactionRepository inventoryTransactionRepository)
     {
         _financialTransactionRepository = financialTransactionRepository;
         _unitOfWork = unitOfWork;
         _buyerRepository = buyerRepository;
+        _inventoryTransactionRepository = inventoryTransactionRepository;
     }
 
     public async Task<Result> DepositAsync(Guid buyerId ,Dictionary<int,int> curvals ,CancellationToken ct)
     {
         if (!await _buyerRepository.AnyAsync(b => b.Id == buyerId,ct))
-            return Result.Failure(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Buyer), buyerId)));
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer), buyerId)));
 
 
         foreach (var item in curvals)
@@ -40,7 +43,21 @@ public class FinancialServices
 
         return Result.Success();
     }
-    
+
+    public async Task<Result<int>> GetBuyerBalanceAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var existingBuyer = await _buyerRepository.GetByIdAsync(id);
+
+        if (existingBuyer == null)
+            return Result.Failure<int>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer), id)));
+        
+        var buyerDeposits =await _financialTransactionRepository.GetBuyerBalanceAsync(id, cancellationToken);
+        var buyerSpends  =await _inventoryTransactionRepository.GetTotalSoldProductsSumPriceAsync(id , cancellationToken);
+        return buyerDeposits - buyerSpends;
+
+
+    }
+  
 
     /// <summary>
     /// withdraw all avalabile balance for a buyer
@@ -50,10 +67,10 @@ public class FinancialServices
     /// <param name="ct"></param>
     /// <returns></returns>
     /// <exception cref="SaveFaildExeption"></exception>
-    public async Task<Result<Dictionary<int,int>>> WithDrawAllBalance(Guid buyerId, CancellationToken ct)
+    public async Task<Result<Dictionary<int,int>>> WithdrawAllBalanceAsync(Guid buyerId, CancellationToken ct)
     {
         if (!await _buyerRepository.AnyAsync(b => b.Id == buyerId))
-            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new EntitiyNotFoundException(typeof(Buyer), buyerId)));
+            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer), buyerId)));
 
         int balance = await _financialTransactionRepository.GetBuyerBalanceAsync(buyerId, ct);
         if (balance <= 0)

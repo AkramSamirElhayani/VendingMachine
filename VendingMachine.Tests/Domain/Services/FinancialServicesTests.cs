@@ -18,15 +18,17 @@ public class FinancialServicesTests
     private Mock<IFinancialTransactionRepository> _financialTransactionRepositoryMock;
     private Mock<IUnitOfWork> _unitOfWorkMock;
     private Mock<IBuyerRepository> _buyerRepositoryMock;
+    private Mock<IInventoryTransactionRepository> _inventoryTransactionRepositoryMock;
     private FinancialServices _financialServices;
 
     [SetUp]
     public void SetUp()
     {
         _financialTransactionRepositoryMock = new Mock<IFinancialTransactionRepository>();
+        _inventoryTransactionRepositoryMock = new Mock<IInventoryTransactionRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _buyerRepositoryMock = new Mock<IBuyerRepository>();
-        _financialServices = new FinancialServices(_financialTransactionRepositoryMock.Object, _unitOfWorkMock.Object, _buyerRepositoryMock.Object);
+        _financialServices = new FinancialServices(_financialTransactionRepositoryMock.Object, _unitOfWorkMock.Object, _buyerRepositoryMock.Object, _inventoryTransactionRepositoryMock.Object);
     }
     [Test]
     public async Task DepositAsync_WithValidParameters_ShouldSucceed()
@@ -64,7 +66,7 @@ public class FinancialServicesTests
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Code == "EntitiyNotFoundException");
+        result.Errors.Should().Contain(e => e.Code == nameof(EntityNotFoundException));
     }
     [Test]
     public async Task WithDrawAllBalance_WithSufficientBalanceAndAvailableCoins_ShouldSucceed()
@@ -87,7 +89,7 @@ public class FinancialServicesTests
             .ReturnsAsync(1);
 
         // Act
-        var result = await _financialServices.WithDrawAllBalance(buyerId, CancellationToken.None);
+        var result = await _financialServices.WithdrawAllBalanceAsync(buyerId, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
@@ -119,7 +121,7 @@ public class FinancialServicesTests
             .ReturnsAsync(1);
 
         // Act
-        var result = await _financialServices.WithDrawAllBalance(buyerId, CancellationToken.None);
+        var result = await _financialServices.WithdrawAllBalanceAsync(buyerId, CancellationToken.None);
 
         // Assert
         result.IsSuccess.Should().BeFalse();

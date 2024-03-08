@@ -6,16 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using VendingMachine.Applicaion.Core.Abstraction;
 using VendingMachine.Domain.Core;
+using VendingMachine.Domain.Interfaces;
 using VendingMachine.Domain.Models;
 using VendingMachine.Domain.Services;
 
 namespace VendingMachine.Applicaion.Buyers.Command.CreateBuyer
 {
-    internal class CreateBuyerCommandHandler : ICommandHandler<CreateBuyerCommand, Guid>
+    public class CreateBuyerCommandHandler : ICommandHandler<CreateBuyerCommand, Guid>
     {
-        private readonly BuyerServices _buyerServices;
+        private readonly IBuyerServices _buyerServices;
 
-        public CreateBuyerCommandHandler(BuyerServices buyerServices)
+        public CreateBuyerCommandHandler(IBuyerServices buyerServices)
         {
             _buyerServices = buyerServices;
         }
