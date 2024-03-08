@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using VendingMachine.Api.Contracts;
@@ -13,23 +14,23 @@ namespace VendingMachine.Api.Controllers;
 
 public class BuyerController: ApiController
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    public BuyerController(IMediator mediator, IHttpContextAccessor httpContextAccessor) : base(mediator)
+ 
+    public BuyerController(IMediator mediator, IHttpContextAccessor httpContextAccessor) : base(mediator, httpContextAccessor)
     {
-        _httpContextAccessor = httpContextAccessor;
+        
     }
 
-   
 
+    [Authorize(Roles = "Buyer")]
     [HttpGet("buyer/{buyerId:guid}")]
     [ProducesResponseType(typeof(Buyer), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetById(Guid buyerId)
     {
-        //var currentBuyerId = GetCurrentBuyerId();
-        //if (buyerId != currentBuyerId)
-        //    return Forbid();
+        var user = GetCurrentUser();
+        if (user.Type != Identity.UserType.Buyer || user.UserId != buyerId)
+            return Forbid();
 
         Result<Buyer> commandResult = await Mediator.Send(new GetBuyerInfoQuery(buyerId));
         if (commandResult.IsFailure && commandResult.Errors.Any(e => e.Code == nameof(EntityNotFoundException)))
@@ -39,20 +40,22 @@ public class BuyerController: ApiController
         return Ok(commandResult.Value);
     }
 
-  
 
+    [Authorize(Roles = "Buyer")]
     [HttpPut("buyer/{buyerId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid buyerId, [FromBody] UpdateBuyerCommand request)
     {
-        var currentBuyerId = GetCurrentBuyerId();
-        if (buyerId != currentBuyerId)
-            return Forbid();
 
         if (request == null)
             return BadRequest($"{nameof(UpdateBuyerCommand)} was null");
+
+        var user = GetCurrentUser();
+        if (user.Type != Identity.UserType.Buyer || user.UserId != buyerId)
+            return Forbid();
+
 
       
 
@@ -64,10 +67,6 @@ public class BuyerController: ApiController
         return Ok();
     }
 
-    private Guid GetCurrentBuyerId()
-    {
-        var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Actor);
-        return Guid.Parse(userId);
-    }
+
 
 }

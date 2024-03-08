@@ -16,6 +16,7 @@ namespace VendingMachine.Domain.Interfaces
         Task<Result> UpdateProductPriceAsync(Guid id, int price, CancellationToken cancellationToken = default);
         Task<Result<int>> AddProductToInventory(Guid productId, int count, CancellationToken ct = default);
         Task<Result> Despense(Guid productId, int count, CancellationToken ct = default);
+        Task<Result> DeleteProductAsync(Guid productId, CancellationToken cancellationToken);
 
     }
 }

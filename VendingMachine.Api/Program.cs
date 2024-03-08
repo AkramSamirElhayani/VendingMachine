@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VendingMachine.Api.Identity;
 using VendingMachine.Api.Identity.TokenHelpers;
+using VendingMachine.Api.Infrastructer;
 using VendingMachine.Applicaion;
 using VendingMachine.Infrastructer;
 using VendingMachine.Infrastructer.Context;
@@ -66,15 +67,26 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.BuildServiceProvider().GetService<ApplicationIdentityDbContext>()!.Database.Migrate();
-builder.Services.BuildServiceProvider().GetService<VendingDbContext>()!.Database.Migrate();
+//builder.Services.BuildServiceProvider().GetService<ApplicationIdentityDbContext>()!.Database.Migrate();
+//builder.Services.BuildServiceProvider().GetService<VendingDbContext>()!.Database.Migrate();
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<ApplicationIdentityDbContext>()!.Database.Migrate();
+    scope.ServiceProvider.GetRequiredService<VendingDbContext>()!.Database.Migrate();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+    await RoleInitializer.InitializeRoles(roleManager);
+}
+
+
 
 //// Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())
 //{
-    app.UseSwagger();
+app.UseSwagger();
     app.UseSwaggerUI();
 //}
 
@@ -86,3 +98,25 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.UseCors();
 app.Run();
+
+
+
+public class RoleInitializer
+{
+    public static async Task InitializeRoles(RoleManager<ApplicationRole> roleManager)
+    {
+        string[] roleNames = { "Admin", "Buyer", "Seller" };
+
+        IdentityResult roleResult;
+
+        foreach (var roleName in roleNames)
+        {
+            var roleExist = await roleManager.RoleExistsAsync(roleName); 
+            if (!roleExist)
+            {
+                // Create the roles and seed them to the database
+                roleResult = await roleManager.CreateAsync(new ApplicationRole(roleName));
+            }
+        }
+    }
+}

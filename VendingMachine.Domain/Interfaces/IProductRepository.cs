@@ -11,5 +11,6 @@ public interface IProductRepository:IGenericRepository<Product>
 {
     Task<Product?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
     Task<bool> IsNameUniqueAsync(Guid execludedId, string name, CancellationToken cancellationToken = default);
+ 
 
 }

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using VendingMachine.Applicaion.Core.Abstraction;
 using VendingMachine.Domain.Models;
 
-namespace VendingMachine.Applicaion.Products.Commands.CreateProduct;
-
-public record CreateProductCommand(string Name, int Price, Guid SellerId, string? Description) :ICommand<Product>
+namespace VendingMachine.Applicaion.Products.Queries.GetProductsQuery
 {
+    public sealed record GetProductsQuery: IQuery<List<Product>>
+    {
+    }
 }
-
-

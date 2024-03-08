@@ -12,13 +12,15 @@ public class Product:Entity
 {
 
 
-    private Product(Guid id, string name, Guid sellerId, string? description, int price) : base(id)
+  
+    private Product(Guid id, string name, Guid sellerId, string? description, int price ) : base(id)
     {
         Name = name;
         Description = description;
         SellerId = sellerId;
         Price = price;
     }
+
 
     public static Product Create(string name ,int price , Guid sellerId , string? description)
     {
@@ -30,7 +32,7 @@ public class Product:Entity
         return new Product(Guid.NewGuid(), name, sellerId, description,price);
     }
 
-    public Result Update(string name, string? description)
+    public  Result Update(string name, string? description)
     {
         if (string.IsNullOrEmpty(name))
             throw new InvalidNameExeption();
@@ -48,9 +50,11 @@ public class Product:Entity
         return Result.Success();
     }
 
+ 
 
     public string Name { get;private set; }
     public int Price { get;private set; }
     public string? Description { get;private set; }
     public Guid SellerId { get; private set; }
+     
 }

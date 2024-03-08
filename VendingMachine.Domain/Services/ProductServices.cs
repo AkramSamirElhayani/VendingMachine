@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using VendingMachine.Domain.Core;
 using VendingMachine.Domain.Exeptions;
 using VendingMachine.Domain.Interfaces;
@@ -119,6 +120,22 @@ public class ProductServices: IProductServices
         var result = await _unitOfWork.SaveChangesAsync();
         if (result == 0)
             throw new SaveFaildExeption("Something went wrong , Inventory Transaction was not created");
+
+        return Result.Success();
+
+    }
+    public async Task<Result> DeleteProductAsync(Guid productId,CancellationToken cancellationToken)
+    {
+        var existingProduct = await _productRepository.GetByIdAsync(productId);
+
+        if (existingProduct == null)
+            return Result.Failure(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), productId)));
+
+        _productRepository.Remove(existingProduct);
+         
+        var result = await _unitOfWork.SaveChangesAsync();
+        if (result == 0)
+            throw new SaveFaildExeption("Something went wrong , product was not deleted");
 
         return Result.Success();
 

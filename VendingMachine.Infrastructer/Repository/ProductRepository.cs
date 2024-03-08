@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,4 +20,10 @@ internal class ProductRepository : GenericRepository<Product>, IProductRepositor
 
     public async Task<bool> IsNameUniqueAsync(Guid excludedId, string name, CancellationToken cancellationToken = default)
         => !await AnyAsync(product => product.Id != excludedId && product.Name == name, cancellationToken);
+
+    public override void Remove(Product entity)
+    {
+        DbContext.Set<Product>().Entry(entity).Property<bool>("IsDeleted").CurrentValue = true;
+        DbContext.Set<Product>().Entry(entity).State = EntityState.Modified;
+    }
 }

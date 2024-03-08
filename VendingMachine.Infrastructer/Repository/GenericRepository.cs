@@ -25,7 +25,7 @@ public abstract class GenericRepository<TEntity> : IGenericRepository<TEntity>
 
     public void Update(TEntity entity) => DbContext.Set<TEntity>().Update(entity);
 
-    public void Remove(TEntity entity) => DbContext.Remove(entity);
+    public virtual void Remove(TEntity entity) => DbContext.Remove(entity);
 
     public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         => await DbContext.GetByIdAsync<TEntity>(id, cancellationToken);

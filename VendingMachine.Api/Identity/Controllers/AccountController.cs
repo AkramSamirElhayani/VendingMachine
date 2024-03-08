@@ -46,6 +46,7 @@ namespace VendingMachine.Api.Identity.Controllers
             {
                 case UserType.Buyer:
                     actorResult = await _mediator.Send(new CreateBuyerCommand(model.Username));
+
                     break;
                 case UserType.Seller:
                     actorResult = await _mediator.Send(new CreateSellerCommand(model.Username));
@@ -69,6 +70,18 @@ namespace VendingMachine.Api.Identity.Controllers
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
+
+            switch (model.UserType)
+            {
+                case UserType.Buyer: 
+                    await _userManager.AddToRoleAsync(user, "Buyer");
+                    break;
+                case UserType.Seller:
+                    await _userManager.AddToRoleAsync(user, "Seller");
+                    break;
+                default: throw new NotImplementedException();
+            }
+            
 
             if (result.Succeeded)
             {
