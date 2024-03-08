@@ -26,6 +26,14 @@ namespace VendingMachine.Infrastructer.Context
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(modelBuilder);
         }
+
+        public async Task<TEntity?> GetByIdAsync<TEntity>(Guid id, CancellationToken cancellationToken = default)
+    where TEntity : Entity
+    => id == Guid.Empty ?
+        null :
+        await Set<TEntity>().FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+
+
         public new DbSet<TEntity> Set<TEntity>()
    where TEntity : Entity
    => base.Set<TEntity>();
@@ -52,9 +60,7 @@ namespace VendingMachine.Infrastructer.Context
         }
 
 
-        /// <inheritdoc />
-
-
+     
 
         private IDbContextTransaction? tranasction;
         public async Task  BeginTransactionAsync(CancellationToken cancellationToken)

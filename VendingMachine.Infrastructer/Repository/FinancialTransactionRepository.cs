@@ -44,9 +44,8 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
     public async Task<Dictionary<int, int>> GetAvalibleCoinsAsync(CancellationToken ct)
     {
         var query = @"
-        SELECT Coin, SUM(CoinCount) AS Count
+        SELECT Coin, SUM(CASE WHEN TransactionType = @DepositType THEN CoinCount ELSE -CoinCount END) AS Balance
         FROM FinancialTransactions
-        WHERE TransactionType = @DepositType
         GROUP BY Coin";
 
         var parameters = new
@@ -54,10 +53,9 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
             DepositType = (int)FinancialTransactionType.Deposit
         };
 
+
         var availableCoins = await _dapperContext.QueryAsync<CoinCount>(query, parameters);
         
-        
-
         return availableCoins.ToDictionary(kvp => kvp.Coin, kvp => kvp.Count);
     }
     private class CoinCount

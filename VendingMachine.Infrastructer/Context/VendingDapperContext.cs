@@ -20,9 +20,10 @@ namespace VendingMachine.Infrastructer.Context
             _connection = new SqlConnection(connectionString);
 
         }
-        public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null) => _connection.QueryAsync<T>(sql, param);
-        public Task<T> ExecuteScalarAsync<T>(string sql, object? param = null) => _connection.ExecuteScalarAsync<T>(sql, param);
+        public Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, CancellationToken cs = default) => _connection.QueryAsync<T>(sql, param);
+        public Task<T> ExecuteScalarAsync<T>(string sql, object? param = null, CancellationToken cs = default) => _connection.ExecuteScalarAsync<T>(sql, param);
 
-
+   
+ 
     }
 }

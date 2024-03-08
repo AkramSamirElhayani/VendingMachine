@@ -52,5 +52,5 @@ public class Product:Entity
     public string Name { get;private set; }
     public int Price { get;private set; }
     public string? Description { get;private set; }
-    public Guid SellerId { get; }
+    public Guid SellerId { get; private set; }
 }

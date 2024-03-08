@@ -13,8 +13,7 @@ namespace VendingMachine.Infrastructer.Configration
     {
    public     void  Configure(EntityTypeBuilder<InventoryTransaction> builder)
         {
-            builder.UseTpcMappingStrategy();
-
+            builder.UseTpcMappingStrategy(); 
             builder
                 .HasOne<Product>()
                 .WithMany()

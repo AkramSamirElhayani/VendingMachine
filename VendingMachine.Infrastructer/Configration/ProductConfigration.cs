@@ -13,7 +13,8 @@ namespace VendingMachine.Infrastructer.Configration
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {
-            throw new NotImplementedException();
+            builder.UseTpcMappingStrategy();
+
         }
     }
 }
