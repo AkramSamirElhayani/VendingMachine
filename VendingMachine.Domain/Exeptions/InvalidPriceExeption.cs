@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VendingMachine.Domain.Exeptions
 {
-    public class InvalidPriceExeption:Exception
+    public class InvalidPriceExeption: DomainExeption
     {
         public InvalidPriceExeption( int smallestCoin) : base($"Invalid Price \n the price must be dividable by ${smallestCoin}") { }
     }

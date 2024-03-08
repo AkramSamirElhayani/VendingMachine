@@ -82,6 +82,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseAuthentication();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.UseCors();
 app.Run();

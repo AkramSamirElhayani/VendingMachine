@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VendingMachine.Domain.Exeptions
 {
-    internal class InsufficantProductBalanceException:Exception
+    internal class InsufficantProductBalanceException: DomainExeption
     {
         public InsufficantProductBalanceException() : base("Product Balance is Insufficant")
         {

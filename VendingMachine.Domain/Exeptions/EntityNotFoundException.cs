@@ -1,6 +1,7 @@
 ﻿using VendingMachine.Domain.Core;
+using VendingMachine.Domain.Exeptions;
 
-public class EntityNotFoundException : System.Exception
+public class EntityNotFoundException : DomainExeption
 {
     public EntityNotFoundException(Entity entity) : base($"{entity.GetType().Name} with Id {entity.Id} was not found")
     {
