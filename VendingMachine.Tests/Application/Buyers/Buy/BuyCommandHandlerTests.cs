@@ -272,7 +272,7 @@ public class BuyCommandHandlerTests
         mockProductServices.Setup(x => x.Despense(productId, amountToPurchase, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result.Success());
 
-        mockInventoryTransactionRepository.Setup(x=>x.GetTotalSoldProductsSumPriceAsync(buyerId, It.IsAny<CancellationToken>()))
+        mockFinancialServices.Setup(x=>x.GetTotalSoldProductsPriceSumAsync(buyerId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(productPrice * amountToPurchase);
 
 

@@ -15,4 +15,5 @@ public interface IFinancialTransactionRepository
     void Insert(FinancialTransaction entity);
     Task<int> GetBuyerBalanceAsync(Guid buyerId , CancellationToken ct);
     Task<Dictionary<int,int>> GetAvalibleCoinsAsync(CancellationToken ct);
+    Task<int> GetTotalSoldProductsPriceSumAsync(Guid id, CancellationToken cancellationToken);
 }

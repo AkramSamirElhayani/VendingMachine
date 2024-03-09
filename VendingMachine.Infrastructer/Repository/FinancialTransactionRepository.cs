@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,41 +22,72 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
 
     public async Task<int> GetBuyerBalanceAsync(Guid buyerId, CancellationToken ct)
     {
-        var query = @"
-            SELECT
-                SUM(CASE WHEN TransactionType = @DepositType THEN Coin * CoinCount ELSE 0 END) -
-                SUM(CASE WHEN TransactionType = @WithdrawType THEN Coin * CoinCount ELSE 0 END) AS Balance
-            FROM FinancialTransactions
-            WHERE BuyerId = @BuyerId";
-
         var parameters = new
         {
             BuyerId = buyerId,
             DepositType = (int)FinancialTransactionType.Deposit,
-            WithdrawType = (int)FinancialTransactionType.Withdraw
+            WithdrawType = (int)FinancialTransactionType.Withdraw,
+            CreditedType = (int)FinancialTransactionType.Credited,
         };
 
-        var balance = await _dapperContext.ExecuteScalarAsync<int>(query, parameters, ct);
+        var totalDepositedQuery = @"
+            SELECT SUM(CoinCount) AS TotalDeposited
+            FROM FinancialTransactions
+            WHERE BuyerId = @BuyerId AND TransactionType = @DepositType";
 
-        return balance;
+        var totalWithdrawenQuery = @"
+            SELECT SUM(CoinCount) AS TotalDeposited
+            FROM FinancialTransactions
+            WHERE BuyerId = @BuyerId AND TransactionType = @WithdrawType";
+
+        var totalCreditedQuery = @"
+            SELECT SUM(CoinCount) AS TotalDeposited
+            FROM FinancialTransactions
+            WHERE BuyerId = @BuyerId AND TransactionType = @CreditedType";
+
+        var deposits = await _dapperContext.ExecuteScalarAsync<int>(totalDepositedQuery, parameters, ct);
+        var withdraws = await _dapperContext.ExecuteScalarAsync<int>(totalWithdrawenQuery, parameters, ct);
+        var credits = await _dapperContext.ExecuteScalarAsync<int>(totalCreditedQuery, parameters, ct);
+
+        return deposits - withdraws - credits;
     }
 
     public async Task<Dictionary<int, int>> GetAvalibleCoinsAsync(CancellationToken ct)
     {
         var query = @"
-        SELECT Coin, SUM(CASE WHEN TransactionType = @DepositType THEN CoinCount ELSE -CoinCount END) AS Balance
+        SELECT Coin, SUM(CASE WHEN TransactionType in (@DepositType,@CreditedType) THEN CoinCount ELSE -CoinCount END) AS Balance
         FROM FinancialTransactions
         GROUP BY Coin";
 
         var parameters = new
         {
-            DepositType = (int)FinancialTransactionType.Deposit
+            DepositType = (int)FinancialTransactionType.Deposit,
+            CreditedType = (int)FinancialTransactionType.Credited
         };
 
 
         var availableCoins = await _dapperContext.QueryAsync<CoinCount>(query, parameters);
         
         return availableCoins.ToDictionary(kvp => kvp.Coin, kvp => kvp.Count);
+    }
+    public async  Task<int> GetTotalSoldProductsPriceSumAsync(Guid buyerId,  CancellationToken cancellationToken)
+    {
+        var parameters = new
+        {
+            BuyerId = buyerId,
+            DepositType = (int)FinancialTransactionType.Deposit,
+            WithdrawType = (int)FinancialTransactionType.Withdraw,
+            CreditedType = (int)FinancialTransactionType.Credited,
+        };
+
+        var totalCreditedQuery = @"
+            SELECT SUM(CoinCount) AS TotalDeposited
+            FROM FinancialTransactions
+            WHERE BuyerId = @BuyerId AND TransactionType = @CreditedType";
+
+        var credits = await _dapperContext.ExecuteScalarAsync<int>(totalCreditedQuery, parameters, cancellationToken);
+
+        return credits;
     }
     private class CoinCount
     {

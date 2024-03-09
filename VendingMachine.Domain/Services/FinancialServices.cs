@@ -52,12 +52,17 @@ public class FinancialServices: IFinancialServices
             return Result.Failure<int>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer), id)));
         
         var buyerDeposits =await _financialTransactionRepository.GetBuyerBalanceAsync(id, cancellationToken);
-        var buyerSpends  =await _inventoryTransactionRepository.GetTotalSoldProductsSumPriceAsync(id , cancellationToken);
+        var buyerSpends  =await _financialTransactionRepository.GetTotalSoldProductsPriceSumAsync(id , cancellationToken);
         return buyerDeposits - buyerSpends;
 
 
     }
-  
+
+    public async Task<int> GetTotalSoldProductsPriceSumAsync(Guid id, CancellationToken cancellationToken)
+    {
+      return  await _financialTransactionRepository.GetTotalSoldProductsPriceSumAsync(id, cancellationToken);
+    }
+
 
     /// <summary>
     /// withdraw all avalabile balance for a buyer

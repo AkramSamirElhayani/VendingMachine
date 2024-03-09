@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VendingMachine.Applicaion.Core.Abstraction;
+using VendingMachine.Domain;
 using VendingMachine.Domain.Core;
 using VendingMachine.Domain.Interfaces;
 using VendingMachine.Domain.Models;
 
 namespace VendingMachine.Applicaion.Products.Queries.GetProductInfo;
 
-public class GetProductInfoQueryHandler : IQueryHandler<GetProductInfoQuery, Product>
+public class GetProductInfoQueryHandler : IQueryHandler<GetProductInfoQuery, ProductInfo>
 {
 
     private readonly IProductRepository _productRepository;
@@ -20,11 +21,11 @@ public class GetProductInfoQueryHandler : IQueryHandler<GetProductInfoQuery, Pro
         _productRepository = productRepository;
     }
 
-    public async Task<Result<Product>> Handle(GetProductInfoQuery request, CancellationToken cancellationToken)
+    public async Task<Result<ProductInfo>> Handle(GetProductInfoQuery request, CancellationToken cancellationToken)
     {
-        var product =await _productRepository.GetByIdAsync(request.productId);
+        var product =await _productRepository.GetProductWithBalanceAsync(request.productId);
         if (product == null)
-            return Result.Failure<Product>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Product), request.productId)));
+            return Result.Failure<ProductInfo>(Error.CreateFormExeption(new EntityNotFoundException(typeof(ProductInfo), request.productId)));
         return product;
     }
 }

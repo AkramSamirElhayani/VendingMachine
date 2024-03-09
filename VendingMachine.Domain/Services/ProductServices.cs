@@ -82,6 +82,7 @@ public class ProductServices: IProductServices
         return Result.Success();
     }
 
+
     /// <summary>
     /// Add Quantity of a product to the Machine and return the new Product Balance
     /// </summary>

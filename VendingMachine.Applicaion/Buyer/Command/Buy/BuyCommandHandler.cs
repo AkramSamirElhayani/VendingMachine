@@ -68,7 +68,7 @@ public class BuyCommandHandler : ICommandHandler<BuyCommand, BuyCommandResponse>
             }else
                 change = new Dictionary<int, int>();
 
-            var buyerSpends = await _inventoryTransactionRepository.GetTotalSoldProductsSumPriceAsync(request.BuyerId, cancellationToken);
+            var buyerSpends = await _financialServices.GetTotalSoldProductsPriceSumAsync(request.BuyerId, cancellationToken);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
             return new BuyCommandResponse(buyerSpends, product, change);

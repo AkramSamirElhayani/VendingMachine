@@ -49,5 +49,6 @@ public class FinancialTransaction : Entity
 public enum FinancialTransactionType
 {
     Deposit,
-    Withdraw
+    Withdraw,
+    Credited
 }

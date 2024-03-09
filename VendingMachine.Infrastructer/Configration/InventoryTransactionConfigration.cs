@@ -17,7 +17,7 @@ namespace VendingMachine.Infrastructer.Configration
             builder
                 .HasOne<Product>()
                 .WithMany()
-                .HasForeignKey(t => t.PorductId);
+                .HasForeignKey(t => t.ProductId);
         }
     }
 }

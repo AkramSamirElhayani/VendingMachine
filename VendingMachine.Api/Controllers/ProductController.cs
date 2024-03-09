@@ -11,6 +11,8 @@ using VendingMachine.Applicaion.Products.Commands.UpdateProduct;
 using VendingMachine.Applicaion.Products.Commands.UpdateProductPrice;
 using VendingMachine.Applicaion.Products.Queries.GetProductInfo;
 using VendingMachine.Applicaion.Products.Queries.GetProductsQuery;
+using VendingMachine.Applicaion.Sellers.Command.AddProductAmount;
+using VendingMachine.Domain;
 using VendingMachine.Domain.Core;
 using VendingMachine.Domain.Models;
 
@@ -28,13 +30,13 @@ public class ProductController : ApiController
     [HttpPost("product/create")]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] CreatePrductRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
   
         var user = GetCurrentUser();
 
         if (request == null)
-            return BadRequest($"{nameof(CreatePrductRequest)} was null");
+            return BadRequest($"{nameof(CreateProductRequest)} was null");
 
   
          
@@ -45,26 +47,26 @@ public class ProductController : ApiController
     }
 
     [HttpGet("product/{productId:guid}")]
-    [ProducesResponseType(typeof(Product), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProductInfo), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetById(Guid productId)
     { 
 
-        Result<Product> commandResult = await Mediator.Send(new GetProductInfoQuery(productId));
+        Result<ProductInfo> commandResult = await Mediator.Send(new GetProductInfoQuery(productId));
         if (commandResult.IsFailure && commandResult.Errors.Any(e => e.Code == nameof(EntityNotFoundException)))
             return NotFound();
         if (commandResult.IsFailure)
             return BadRequest(commandResult.Errors);
- 
 
+ 
 
         return Ok(commandResult.Value);
     }
 
    
     [HttpGet("product")]
-    [ProducesResponseType(typeof(List<Product>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<ProductInfo>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetAll()
@@ -91,7 +93,7 @@ public class ProductController : ApiController
 
         var user = GetCurrentUser();
 
-        Result<Product> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
+        Result<ProductInfo> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
         if (productResult.IsFailure )
             return BadRequest(productResult.Errors);
 
@@ -123,7 +125,7 @@ public class ProductController : ApiController
 
         var user = GetCurrentUser();
 
-        Result<Product> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
+        Result<ProductInfo> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
         if (productResult.IsFailure)
             return BadRequest(productResult.Errors);
 
@@ -140,6 +142,36 @@ public class ProductController : ApiController
         return Ok();
     }
 
+    [Authorize(Roles = "Seller")]
+    [HttpPut("product/addAmount/{productId:guid}")]
+    [ProducesResponseType(typeof(Result<int>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddProductAmount(Guid productId, [FromBody] AddProductAmountCommand request)
+    {
+
+        if (request == null)
+            return BadRequest($"{nameof(UpdateProductPriceCommand)} was null");
+
+        var user = GetCurrentUser();
+
+        Result<ProductInfo> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
+        if (productResult.IsFailure)
+            return BadRequest(productResult.Errors);
+
+        if (user.UserId != productResult.Value.SellerId)
+            return Forbid();
+
+
+
+        Result<int> commandResult = await Mediator.Send(request);
+        if (commandResult.IsFailure && commandResult.Errors.Any(e => e.Code == nameof(EntityNotFoundException)))
+            return NotFound();
+        if (commandResult.IsFailure)
+            return BadRequest(commandResult.Errors);
+        return Ok(commandResult);
+    }
+
 
     [Authorize(Roles = "Seller")]
     [HttpDelete("product/{productId:guid}")]
@@ -154,7 +186,7 @@ public class ProductController : ApiController
 
         var user = GetCurrentUser();
 
-        Result<Product> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
+        Result<ProductInfo> productResult = await Mediator.Send(new GetProductInfoQuery(productId));
         if (productResult.IsFailure)
             return BadRequest(productResult.Errors);
 
@@ -172,4 +204,4 @@ public class ProductController : ApiController
 
 }
 
-public record CreatePrductRequest(string Name , string? Descreption ,int price);
+public record CreateProductRequest(string Name , string? Descreption ,int price);

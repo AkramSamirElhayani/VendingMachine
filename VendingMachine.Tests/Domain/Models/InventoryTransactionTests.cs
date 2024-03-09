@@ -63,7 +63,7 @@ public class InventoryTransactionTests
 
         // Assert
         transaction.Should().NotBeNull();
-        transaction.PorductId.Should().Be(productId);
+        transaction.ProductId.Should().Be(productId);
         transaction.Count.Should().Be(count);
         transaction.TransactionType.Should().Be(transactionType);
         transaction.Date.Should().BeCloseTo(DateTime.Now, TimeSpan.FromSeconds(1)); // Allows a small leeway in timing

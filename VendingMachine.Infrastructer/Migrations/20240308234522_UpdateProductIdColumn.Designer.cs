@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VendingMachine.Infrastructer.Context;
 
@@ -11,9 +12,11 @@ using VendingMachine.Infrastructer.Context;
 namespace VendingMachine.Infrastructer.Migrations
 {
     [DbContext(typeof(VendingDbContext))]
-    partial class VendingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240308234522_UpdateProductIdColumn")]
+    partial class UpdateProductIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

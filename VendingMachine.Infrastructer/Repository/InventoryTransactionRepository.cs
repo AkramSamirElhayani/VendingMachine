@@ -20,15 +20,18 @@ internal class InventoryTransactionRepository : IInventoryTransactionRepository
 
     public void Insert(InventoryTransaction entity) => _dbContext.Insert(entity);
 
-    public async Task<int> GetProductBalanceAsync(Guid productId, CancellationToken ct)
+    public async  Task<int> GetProductBalanceAsync(Guid productId, CancellationToken ct)
     {
-        // Implement the logic to get the product balance
-        throw new NotImplementedException();
+        var depositsCount =   _dbContext.Set<InventoryTransaction>()
+            .Where(it => it.ProductId == productId && it.TransactionType == InventoryTransactionType.Add)
+            .Sum(it => it.Count);
+
+        var withdrawalsCount =   _dbContext.Set<InventoryTransaction>()
+            .Where(it => it.ProductId == productId && it.TransactionType == InventoryTransactionType.Remove)
+            .Sum(it => it.Count);
+
+        return (int)(depositsCount - withdrawalsCount);
     }
 
-    public async Task<int> GetTotalSoldProductsSumPriceAsync(Guid id, CancellationToken cancellationToken)
-    {
-        // Implement the logic to get the total sum of sold product prices
-        throw new NotImplementedException();
-    }
+ 
 }

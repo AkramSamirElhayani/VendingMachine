@@ -11,9 +11,9 @@ public class InventoryTransaction:Entity
 {
 
 
-    private InventoryTransaction(Guid id, Guid porductId, int count, DateTime date, InventoryTransactionType transactionType, int unitPrice) : base(id)
+    private InventoryTransaction(Guid id, Guid productId, int count, DateTime date, InventoryTransactionType transactionType, int unitPrice) : base(id)
     {
-        PorductId = porductId;
+        ProductId = productId;
         Count = count;
         Date = date;
         TransactionType = transactionType;
@@ -31,10 +31,10 @@ public class InventoryTransaction:Entity
         return new InventoryTransaction(Guid.NewGuid(), productId, count, DateTime.Now,transactionType, unitPrice);
     }
 
-    public Guid PorductId { get; set; }
-    public int Count { get; set; }
-    public int UnitPrice { get; set; }
-    public DateTime Date { get; set; }
+    public Guid ProductId { get;private set; }
+    public int Count { get; private set; }
+    public int UnitPrice { get; private set; }
+    public DateTime Date { get; private set; }
     public InventoryTransactionType TransactionType { get; set; }
 }
 public enum InventoryTransactionType
