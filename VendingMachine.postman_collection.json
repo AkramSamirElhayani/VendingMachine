@@ -1,0 +1,306 @@
+{
+	"info": {
+		"_postman_id": "9a613824-ca16-411e-8d24-9dcdfd793258",
+		"name": "VendingMachine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "15267481"
+	},
+	"item": [
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Sprites cola\",\r\n  \"descreption\": \"Spark\",\r\n  \"price\": 25\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/product/create"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/product/5e8f1d4b-15f6-40e2-a420-dcc61f2c6d70"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/product"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/api/product/8b977779-2779-4410-aa1c-512a1ec35faf"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": \"5e8f1d4b-15f6-40e2-a420-dcc61f2c6d70\",\r\n  \"name\": \"Coca cola\",\r\n  \"description\": \"Updated\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/product/5e8f1d4b-15f6-40e2-a420-dcc61f2c6d70"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product Price",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": \"5e8f1d4b-15f6-40e2-a420-dcc61f2c6d70\",\r\n  \"price\": 15\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/product/setPrice/5e8f1d4b-15f6-40e2-a420-dcc61f2c6d70"
+					},
+					"response": []
+				},
+				{
+					"name": "Add Amount",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": \"ba6037f8-4385-44f5-8f26-083133e39b64\",\r\n  \"amount\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/product/addAmount/ba6037f8-4385-44f5-8f26-083133e39b64\n"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Buyer",
+			"item": [
+				{
+					"name": "Get Buyer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/buyer"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Buyer",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"buyerId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"name\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/buyer"
+					},
+					"response": []
+				},
+				{
+					"name": "Deposit",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"buyerId\": \"1d5b7804-8c89-41d7-8272-f47bfdc66517\",\r\n  \"coins\": {\r\n    \"5\": 2,\r\n    \"10\": 1,\r\n    \"20\": 1\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/buyer/deposit"
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"buyerId\": \"1d5b7804-8c89-41d7-8272-f47bfdc66517\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/buyer/withdraw"
+					},
+					"response": []
+				},
+				{
+					"name": "Buy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"buyerId\": \"1d5b7804-8c89-41d7-8272-f47bfdc66517\",\r\n  \"productId\": \"ba6037f8-4385-44f5-8f26-083133e39b64\",\r\n  \"amount\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/buyer/buy"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Seller",
+			"item": [
+				{
+					"name": "Get Seller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/api/seller"
+					},
+					"response": []
+				},
+				{
+					"name": "Update seller",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sellerId\": \"f8bf8ce9-cf31-4776-af8a-71f6b7902c98\",\r\n  \"name\": \"Seller2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/api/seller"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Identity",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"Buyer1\",\r\n  \"email\": \"Buyer1@mail.com\",\r\n  \"password\": \"Buyer1@mail.com\",\r\n  \"userType\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/register"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"Buyer1\", \r\n  \"password\": \"Buyer1@mail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/login"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiQnV5ZXIxIiwiQWN0b3JUeXBlIjoiMCIsIkFwcGxpY2F0aW9uVXNlcklkIjoiOTEyYjY5ZWYtMGMzOS00NjUwLWI0NzgtMDhkYzNmZDE2ZDkwIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwOS8wOS9pZGVudGl0eS9jbGFpbXMvYWN0b3IiOiIxZDViNzgwNC04Yzg5LTQxZDctODI3Mi1mNDdiZmRjNjY1MTciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJCdXllciIsImV4cCI6MTcwOTk1MzY0MSwiaXNzIjoiVmVuZGluZ1N5c3RlbSIsImF1ZCI6IkFwcGxpY2F0aW9uVXNlcnMifQ.HUnCFB6Dd3rEalO-0C0kTSq6Mie_tpvTrfJ0eTc1HLk"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://localhost:7176",
+			"type": "string"
+		}
+	]
+}
