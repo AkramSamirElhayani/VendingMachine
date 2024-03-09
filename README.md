@@ -1,4 +1,6 @@
-[Live Demo](http://164.68.110.233/swagger/index.html)
+# Live Demo
+[Swagger](http://164.68.110.233/swagger/index.html)
+
 
 # Vending Machine Service (VMS)
 
