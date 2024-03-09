@@ -31,18 +31,18 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
         };
 
         var totalDepositedQuery = @"
-            SELECT SUM(CoinCount) AS TotalDeposited
-            FROM FinancialTransactions
+            SELECT SUM(CoinCount * Coin) AS TotalDeposited
+            FROM FinancialTransaction
             WHERE BuyerId = @BuyerId AND TransactionType = @DepositType";
 
         var totalWithdrawenQuery = @"
-            SELECT SUM(CoinCount) AS TotalDeposited
-            FROM FinancialTransactions
+            SELECT SUM(CoinCount * Coin) AS TotalDeposited
+            FROM FinancialTransaction
             WHERE BuyerId = @BuyerId AND TransactionType = @WithdrawType";
 
         var totalCreditedQuery = @"
-            SELECT SUM(CoinCount) AS TotalDeposited
-            FROM FinancialTransactions
+            SELECT SUM(CoinCount * Coin) AS TotalDeposited
+            FROM FinancialTransaction
             WHERE BuyerId = @BuyerId AND TransactionType = @CreditedType";
 
         var deposits = await _dapperContext.ExecuteScalarAsync<int>(totalDepositedQuery, parameters, ct);
@@ -55,8 +55,13 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
     public async Task<Dictionary<int, int>> GetAvalibleCoinsAsync(CancellationToken ct)
     {
         var query = @"
-        SELECT Coin, SUM(CASE WHEN TransactionType in (@DepositType,@CreditedType) THEN CoinCount ELSE -CoinCount END) AS Balance
-        FROM FinancialTransactions
+        SELECT Coin, SUM(
+CASE 
+WHEN TransactionType = @DepositType  THEN CoinCount
+WHEN TransactionType = @CreditedType     THEN 0 
+ELSE -CoinCount 
+END) AS Count
+        FROM FinancialTransaction
         GROUP BY Coin";
 
         var parameters = new
@@ -81,8 +86,8 @@ namespace VendingMachine.Infrastructer.Repository; internal class FinancialTrans
         };
 
         var totalCreditedQuery = @"
-            SELECT SUM(CoinCount) AS TotalDeposited
-            FROM FinancialTransactions
+            SELECT SUM(CoinCount*Coin) AS TotalDeposited
+            FROM FinancialTransaction
             WHERE BuyerId = @BuyerId AND TransactionType = @CreditedType";
 
         var credits = await _dapperContext.ExecuteScalarAsync<int>(totalCreditedQuery, parameters, cancellationToken);

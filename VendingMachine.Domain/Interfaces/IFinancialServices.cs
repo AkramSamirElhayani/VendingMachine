@@ -15,6 +15,5 @@ public interface IFinancialServices
     Task<Result<int>> GetBuyerBalanceAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result<Dictionary<int, int>>> WithdrawAllBalanceAsync(Guid buyerId, CancellationToken ct);
     Task<int> GetTotalSoldProductsPriceSumAsync(Guid id, CancellationToken cancellationToken);
-
-
+    Task<Result> Credit(Guid buyerId,int amount, CancellationToken cancellationToken);
 }

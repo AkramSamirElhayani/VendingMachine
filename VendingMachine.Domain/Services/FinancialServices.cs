@@ -26,6 +26,50 @@ public class FinancialServices: IFinancialServices
         _inventoryTransactionRepository = inventoryTransactionRepository;
     }
 
+    public async Task<Result>  Credit(Guid buyerId, int amount, CancellationToken ct)
+    {
+        if (!await _buyerRepository.AnyAsync(b => b.Id == buyerId))
+            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new EntityNotFoundException(typeof(Buyer), buyerId)));
+
+        int balance = await _financialTransactionRepository.GetBuyerBalanceAsync(buyerId, ct);
+        if (balance <  amount)
+            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new InsufficantBalanceException()));
+      
+        Dictionary<int, int> availableCoins = await _financialTransactionRepository.GetAvalibleCoinsAsync(ct);
+        availableCoins = availableCoins.Where(c => c.Value > 0).OrderByDescending(x => x.Key).ToDictionary();
+
+        Dictionary<int, int> coinsToCredit = new Dictionary<int, int>();
+        foreach (var coin in availableCoins)
+        {
+            int requierdCoinCount = amount / coin.Key;
+            if (requierdCoinCount == 0)
+                continue;
+            if (coin.Value >= requierdCoinCount)
+            {
+                coinsToCredit.Add(coin.Key, requierdCoinCount);
+                amount = amount % coin.Key;
+            }
+            else
+            {
+                coinsToCredit.Add(coin.Key, coin.Value);
+                amount = amount - (coin.Key * coin.Value);
+            }
+        }
+        if (amount > 0)
+            return Result.Failure<Dictionary<int, int>>(Error.CreateFormExeption(new InsufficantBalanceException()));
+
+        foreach (var item in coinsToCredit)
+        {
+            _financialTransactionRepository.Insert(FinancialTransaction.Create(buyerId, FinancialTransactionType.Credited, item.Key, item.Value));
+        }
+
+        var result = await _unitOfWork.SaveChangesAsync();
+        if (result == 0)
+            throw new SaveFaildExeption("Something went wrong , buyer data was not saved");
+
+        return Result.Success(coinsToCredit);
+    }
+
     public async Task<Result> DepositAsync(Guid buyerId ,Dictionary<int,int> curvals ,CancellationToken ct)
     {
         if (!await _buyerRepository.AnyAsync(b => b.Id == buyerId,ct))
@@ -88,6 +132,8 @@ public class FinancialServices: IFinancialServices
         foreach (var coin in availableCoins)
         {
             int requierdCoinCount = balance / coin.Key;
+            if (requierdCoinCount == 0)
+                continue;
             if(coin.Value >= requierdCoinCount)
             {
                 coinsToWithdraw.Add(coin.Key, requierdCoinCount);

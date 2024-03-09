@@ -19,17 +19,15 @@ public class SellerController:ApiController
 
 
     [Authorize(Roles = "Seller")]
-    [HttpGet("seller/{sellerId:guid}")]
+    [HttpGet("seller")]
     [ProducesResponseType(typeof(Seller), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetById(Guid sellerId)
+    public async Task<IActionResult> Get( )
     {
-        var user = GetCurrentUser();
-        if (user.Type != Identity.UserType.Seller || user.UserId != sellerId)
-            return Forbid();
+        var user = GetCurrentUser(); 
 
-        Result<Seller> commandResult = await Mediator.Send(new GetSellerInfoQuery(sellerId));
+        Result<Seller> commandResult = await Mediator.Send(new GetSellerInfoQuery(user.UserId));
         if (commandResult.IsFailure && commandResult.Errors.Any(e => e.Code == nameof(EntityNotFoundException)))
             return NotFound(commandResult.Errors);
         if (commandResult.IsFailure)
@@ -39,18 +37,18 @@ public class SellerController:ApiController
 
 
     [Authorize(Roles = "Seller")]
-    [HttpPut("seller/{sellerId:guid}")]
+    [HttpPut("seller")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Update(Guid sellerId, [FromBody] UpdateSellerCommand request)
+    public async Task<IActionResult> Update( [FromBody] UpdateSellerCommand request)
     {
 
         if (request == null)
             return BadRequest($"{nameof(UpdateSellerCommand)} was null");
 
         var user = GetCurrentUser();
-        if (user.Type != Identity.UserType.Seller || user.UserId != sellerId)
+        if (user.Type != Identity.UserType.Seller || user.UserId != request.SellerId)
             return Forbid();
 
 

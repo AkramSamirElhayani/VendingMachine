@@ -44,39 +44,30 @@ public class BuyCommandHandler : ICommandHandler<BuyCommand, BuyCommandResponse>
         if (balanceResult.Value < request.Amount * product.Price)
             return Result.Failure<BuyCommandResponse>(Error.CreateFormExeption(new InsufficantBalanceException()));
 
-        await _unitOfWork.BeginTransactionAsync(cancellationToken);
-        try
-        {
+    
+      
             Result result = await _productServices.Despense(request.ProductId, request.Amount, cancellationToken);
-
+            
             if (result.IsFailure)
             {
-                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                 return Result.Failure<BuyCommandResponse>(result.Errors);
             }
-
+            result = await _financialServices.Credit(request.BuyerId, request.Amount*product.Price, cancellationToken);
             Dictionary<int, int> change;
             if(balanceResult.Value > (product.Price * request.Amount))
             {
-                var changeResult = await _financialServices.WithdrawAllBalanceAsync(request.ProductId, cancellationToken);
+                var changeResult = await _financialServices.WithdrawAllBalanceAsync(request.BuyerId, cancellationToken);
                 if (changeResult.IsFailure)
                 {
-                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
                     return Result.Failure<BuyCommandResponse>(changeResult.Errors);
                 }
                 change = changeResult.Value;
             }else
                 change = new Dictionary<int, int>();
-
             var buyerSpends = await _financialServices.GetTotalSoldProductsPriceSumAsync(request.BuyerId, cancellationToken);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
             return new BuyCommandResponse(buyerSpends, product, change);
-        }
-        catch (Exception)
-        {
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-            throw;
-        }
+      
     }
 }

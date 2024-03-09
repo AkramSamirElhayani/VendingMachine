@@ -26,9 +26,10 @@ internal class ProductRepository : GenericRepository<Product>, IProductRepositor
         var query = @"
         SELECT p.Id,p.SellerId, p.Name, p.Description, p.Price,
                COALESCE(SUM(CASE WHEN it.TransactionType = @DepositType THEN it.Count ELSE -it.Count END), 0) AS AmountAvailable
-        FROM Products p
-        LEFT JOIN InventoryTransactions it ON p.Id = it.ProductId
-        GROUP BY p.Id, p.Name, p.Description, p.Price;
+        FROM Product p
+        LEFT JOIN InventoryTransaction it ON p.Id = it.ProductId
+        WHERE p.IsDeleted = 0
+        GROUP BY p.Id, p.Name, p.Description, p.Price,p.SellerId
     ";
 
         var parameters = new
@@ -47,10 +48,10 @@ internal class ProductRepository : GenericRepository<Product>, IProductRepositor
         var query = @"
         SELECT p.Id,p.SellerId, p.Name, p.Description, p.Price,
                COALESCE(SUM(CASE WHEN it.TransactionType = @DepositType THEN it.Count ELSE -it.Count END), 0) AS AmountAvailable
-        FROM Products p
-        LEFT JOIN InventoryTransactions it ON p.Id = it.ProductId AND it.ProductId = @ProductId
-        WHERE p.Id = @ProductId
-        GROUP BY p.Id, p.Name, p.Description, p.Price;
+        FROM Product p
+        LEFT JOIN InventoryTransaction it ON p.Id = it.ProductId AND it.ProductId = @ProductId
+        WHERE p.Id = @ProductId AND p.IsDeleted = 0
+        GROUP BY p.Id, p.Name, p.Description, p.Price,p.SellerId
     ";
 
         var parameters = new
