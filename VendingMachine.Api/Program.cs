@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using VendingMachine.Api.Identity;
 using VendingMachine.Api.Identity.TokenHelpers;
@@ -12,6 +13,10 @@ using VendingMachine.Infrastructer.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseSerilog((context, loggerConfigration) =>
+{
+    loggerConfigration.ReadFrom.Configuration(context.Configuration);
+});
 // Add services to the container.
 
 builder.Services.AddHttpContextAccessor();
@@ -91,7 +96,8 @@ app.UseSwagger();
 //}
 
 app.UseHttpsRedirection();
-
+app.UseMiddleware<RequstLogMiddleware>();
+app.UseSerilogRequestLogging();
 app.UseAuthorization();
 app.UseAuthentication();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
